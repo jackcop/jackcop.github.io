@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <head>
+         <meta name="viewport" content="width=device-width, initial-scale=1">
+         <link rel="stylesheet" href="style.css">
+         <title>Earth Now</title>
+   </head>
+   <body>
+      <div class="topnav">
+         <a href="../index.html">Home</a>
+         <a class="active" href="projects.html">Projects</a>
+         <a href="CV.html">CV</a>
+         <a href="contact.html">Contact</a>
+       </div>
+     
+       <p></p>
+
+      <div class="transparent_bg">
+         <h1>Projects</h1>
+         <p></p>
+        </p>
+        <h2>earth-now.net</h2>
+         <figure>
+         <img src="https://www.earth-now.net/images/projected/global_mosaic.jpg" alt="Global mosaic" style="width:75%"/>
+         <p></p>
+         <figcaption style="text-align: center;">Latest global mosaic</figcaption>
+         </figure>
+        <p style="text-align: left;">
+            I created a website, <a href="https://www.earth-now.net">earth-now</a>, 
+            that generates a visible and IR composite mosaic of the Earth 
+            from five geostationary satellites every thirty minutes. For more information,
+            see the following blog post:
+            <a href="earth-now.html">Getting the latest global imagery</a>
+        </p>
+        <h2>Honors thesis</h2>
+        <figure>
+         <img src="../images/thesis_figure.png" alt="Thesis figure" style="width:75%"/>
+         <p></p>
+         <figcaption style="text-align: center;"><i>Model results</i></figcaption>
+        </figure>
+        <p style="text-align: left;">
+               My undergraduate honors thesis, completed in May of 2023, was titled 
+               <a href="../copeland_honors_thesis.pdf"><i>Geochemical Analysis and Numerical Modeling of 
+               Central and East Tennessee Mississippi Valley-Type Ore Districts: Constraints on Ore Genesis</i></a>.
+         </p>
+         <p style="text-align: left;">
+            In addition to processing sphalerite ores from these districts for isotopic analysis, I created a simple stochastic model to
+            simulate mixing between multiple ore fluids. This model was utilized to semiquantitatively compare lead (Pb) 
+            isotope data from multiple districts to predicted results from likely mixing scenarios. 
+         </p>
+         <p style="text-align: left;">
+            Results contradicted previous hypotheses which speculated that an Illinois-Kentucky source 
+            supplied some ore fluids to Central Tennessee and Kentucky, while supporting claims
+            that they share a relationship with the East Tennessee district.
+         </p>
+         <h2>astro-sim</h2>
+         <div style="text-align: center;">
+            <iframe allow="fullscreen" width="75%" height="300px" src="https://www.youtube.com/embed/dhKeoYHyG60"></iframe>
+         </div>
+         <p style="text-align: left;">
+            Astro-sim is a simple brute-force finite element NBody particle simulation using OpenGL and CUDA,
+            written in C++. I created it as an opportunity to learn the basics of 
+            parallel programming with CUDA and explore scientific visualization with OpenGL.
+            Particles are colored based on their velocities, resulting in a mesmerizing display
+            of symmetry, depending on the initial conditions. For more details, see the following blog post:
+            <a href="astro-sim.html">A brute-force NBody approach to modeling gravity</a>
+         </p>
+      </div>
+
+   </body>
+</html>

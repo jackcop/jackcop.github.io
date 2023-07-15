@@ -1,0 +1,156 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="style.css">
+        <title>astro-sim</title>
+
+        <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+        </script>
+    
+      </head>
+
+    <body>
+        <div class="topnav">
+            <a href="../index.html">Home</a>
+            <a href="projects.html">Projects</a>
+            <a href="CV.html">CV</a>
+            <a href="contact.html">Contact</a>
+        </div>
+
+        <div class="transparent_bg">
+        <h1>A Brute-force NBody Approach to Modeling Gravity</h1>
+        <h2><i>August 16, 2022</i></h2>
+        <p>
+            <i>Edit: July 13, 2023: This project was created due to my 
+            interest in the alluring and beautiful work of using large astrophysical models
+            to understand the Universe. Although I still find these models fascinating, my primary 
+            focus has long been towards remote sensing and planetary science.</i>
+        </p>
+        <h2>Introduction</h2>
+        <p>
+            For this project, I don't intend to go in-depth on the specifics of the code. If there 
+            are any questions about how to do this yourself, visit my GitHub or feel free to contact
+            me. I've chosen to use CUDA (NVIDIA's parallel programming language) for its documentation and widespread use
+            and OpenGL (for displaying the particles). 
+        </p>
+        <p>
+            I am most interested in
+            explaining the physics that underlie the algorithm used in this project and providing you 
+            with some short clips demonstrating the application in all its glory. So, as a teaser, 
+            here's a little clip of what I've got going at the moment:
+        </p>
+        <div style="text-align: center;">
+            <iframe allow="fullscreen" width="75%" height="300px" src="https://www.youtube.com/embed/dhKeoYHyG60"></iframe>
+        </div>
+        <p>
+            I know I'm biased, but that looks pretty cool to me. Okay, without further ado, let's get 
+            into the simulation. The only equation needed to understand how the program operates is Newton's 
+            law of universal gravitation: 
+        </p>
+        <p>
+            \begin{equation}F=G\frac{m_1m_2}{r^2}\end{equation}
+        </p>
+        <p>
+            This equation simply states that two objects of masses m<sub>1</sub> and m<sub>2</sub> exert a force on each other that 
+            is directly proportional to the product of their masses and inversely proportional to the square of 
+            the distance between them. G refers to the gravitational constant, which is 6.674×10<sup>-11</sup> m<sup>3</sup>⋅kg<sup>-1</sup>⋅s<sup>-2</sup>.
+        </p>
+        <p>
+            Luckily, we aren't actually interested in the force acting on each body, but rather the acceleration of each body 
+            due to said forces because this will allow us to determine the particle's positions as a function of time. Thanks to the equation, 
+        </p>
+        <p>
+            \begin{equation}a=\frac{F}{m}\end{equation}
+        </p>
+        <p>
+            the first equation can be simplified to
+        </p>
+        <p>
+            \begin{equation}a_1=G\frac{m_2}{r^2}\end{equation}
+        </p>
+        <p>
+            This equation is the basis for updating particle positions over time.
+        </p>
+        <h2 style="text-align: center;">The Code</h2>
+        <p>
+            Here, I used what is known as "Euler's method" for solving for the position of each particle. Put simply, the function which describes 
+            the changing position of each particle is a differential equation which uses infinitesimally small time increments to compute a finite 
+            change in position over a finite time interval. By using Euler's method, a finite timestep is used. Thus, one could imagine a particle 
+            which is experiencing some gravitational acceleration. Using Euler's method, that acceleration will be assumed to be constant for the 
+            entire duration of the timestep. In reality the particle experiences a continuously changing acceleration. Euler's method is thus a first-order
+            approximation, and a small delta time should be used to minimize inaccuracies. 
+        </p>
+        <p>
+            Worse yet, I applied a "brute-force" method with this application. By this I mean that the acceleration of each particle is computed by 
+            determining the distance to every other particle. In other words, if you have a simulation with 40,000 particles, each one of those particles must 
+            compute the acceleration due to gravity from all 39,999 other particles and sum them up to provide the final acceleration for that time step. 
+            Although this is the physically accurate way to perform the task,
+            it is by no means the most efficient method to perform this simulation, and I may explore alternatives like the Barnes-Hut algorithm in a
+            future project.
+        </p>
+        <p>
+            The first step was to create two shared memory buffers consisting of float3 arrays. These buffers contain the position and velocity data that 
+            will be used to provide the initial conditions for the simulation for each time step as well as for coloring the particles based on their speed. 
+            The buffers are passed to a CUDA kernel where they begin to do their magic. First, an initialization kernel sets the position of each particle 
+            based on its CUDA thread and block indices. Then the physics kernel loops over all particles and calculates the distance between them and 
+            the current particle in the threadblock. Because each particle's position consists of an x, y, and z value, this is achieved using the equation:
+        </p>
+        <p>
+            \begin{equation}r = \sqrt{(n_{ix} - n_{jx})^2+(n_{iy} - n_{jy})^2+(n_{iz} - n_{jz})^2}\end{equation}
+        </p>
+        <p>
+            Which is just the Pythagorean theorem in three dimensions. I simplified my life by making all bodies in this simulation the same mass. 
+            By doing this, I can compute the acceleration due to any body using equation 3 without needing another buffer to store mass data. After computing 
+            the magnitude of the acceleration, the x, y, and z components of acceleration can be computed by using the equation:
+        </p>
+        <p>
+            \begin{equation}\vec{a}=\biggr{\langle}{|\vec{a}|\biggr{(}\frac{\vec{r_x}}{|\vec{r}|}\biggr{)}},{|\vec{a}|\biggr{(}\frac{\vec{r_y}}{|\vec{r}|}\biggr{)}},{|\vec{a}|\biggr{(}\frac{\vec{r_z}}{|\vec{r}|}\biggr{)}}\biggr{\rangle}\end{equation}
+        </p>
+        <p>
+            This equation is based on the idea that an object will accelerate along the vector pointing towards another object. 
+            If you divide the x, y, and z components of this direction vector by the magnitude of the distance, you get a unit vector which, when multiplied by the 
+            magnitude of the acceleration, gives you a three dimensional vector representing the acceleration of the particle. By summing the acceleration 
+            vectors together from all other particles, a final net acceleration vector is returned.
+        </p>
+        <p>
+            So, in order to convert the calculated acceleration values into a new position, we have to integrate the velocity with respect to time. Velocity is given by:
+        </p>
+        <p>
+            \begin{equation}v = v_0 + at\end{equation}
+        </p>
+        <p>
+            We calculate the velocity of the particle by multiplying the net acceleration by our fixed timestep and adding it to the initial velocity.
+            By integrating this function, we arrive at the equation relating position to this value: 
+        </p>
+        <p>
+            \begin{equation}p=\int{v_0 + at}\hspace{0.25em}dt=v_0t+\frac{1}{2}vt^2+p_0\end{equation}
+        </p>
+        <p>
+            Where <i>p</i> and <i>p<sub>0</sub></i> are the updated and initial positions, respectively. <i>p</i> is then used as the final position of the particle! The velocity buffer is also
+            updated in the process with the new velocity values.
+        </p>
+        <p>
+            Thus, in each timestep, for each particle, the acceleration is calculated, the velocity is updated based on this acceleration acting over a fixed timestep,
+            and the position is updated based on this velocity acting over the same fixed timestep. This process is repeated for each cycle, and the result is the illusion
+            of continuous motion.
+        </p>
+        <p>
+            The velocity was used in the vertex shader to compute color values for each particle. Particles which have greater velocities have a bluer color.
+        </p>
+        <h2 style="text-align: center;">The Results</h2>
+        <p>
+            Wow, this project took me longer than I care to admit, and was in large part an effort to just learn better programming.
+            Overall, although the code may be messy, I'm pretty happy with the results: Here's some beautiful simulations.
+        </p>
+        <div style="text-align: center;">
+            <iframe allow="fullscreen" width="75%" height="300px" src="https://www.youtube.com/embed/MvXOW_wAjn8"></iframe>
+            <p><i>A hemisphere with n = 1024 particles</i></p>
+        </div>
+        <div style="text-align: center;">
+            <iframe allow="fullscreen" width="75%" height="300px" src="https://www.youtube.com/embed/yK5r0Y7RLv0"></iframe>
+            <p><i>A disk with n = 1024 particles</i></p>
+        </div>
+        </div>
+    </body>
+</html>

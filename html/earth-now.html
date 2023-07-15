@@ -1,0 +1,84 @@
+<!--use same style as astr-sim.html-->
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="style.css">
+        <title>Jackson Copeland</title>
+    </head>
+    <body>
+        <div class="topnav">
+            <a href="../index.html">Home</a>
+            <a href="projects.html">Projects</a>
+            <a href="CV.html">CV</a>
+            <a href="contact.html">Contact</a>
+        </div>
+
+        <div class="transparent_bg">
+            <h1>Getting the Latest Global Imagery with Earth-now</h1>
+            <h2><i>July 13, 2023</i></h2>
+            <h2>Introduction</h2>
+            <p>
+                Disappointed with the lack of up-to-date, freely available global mosaics
+                in true color, last month I decided to create a website that provides
+                the latest global visible and IR composites every 30 minutes from five geostationary satellites,
+                GOES-16, GOES-18, Himawari-9, Meteosat-9, and Meteosat-10. The site is called 
+                <a href="https://www.earth-now.net">earth-now</a>.
+            </p>
+            <p>
+                Imager data for GOES-16, GOES-18, and Himawari are provided by the National
+                Oceanic and Atmospheric Administration (NOAA) on public AWS S3 buckets.
+                Meteosat data must be obtained from the European Organisation for the Exploitation
+                of Meteorological Satellites (EUMETSAT) by creating an account and 
+                using their <a href="https://data.eumetsat.int/search">data store</a>.
+            </p>
+            <p>
+                I wrote a Python script that automatically locates and downloads the latest files
+                for any particular channel from each satellite. Data is processed using Satpy, a Python
+                library which provides tools to create composite images from satellite data.
+            </p>
+            <h2>Image Processing</h2>
+            <p>
+                Full disk data is first projected into the Mercator projection with Satpy.
+                True color images, generated using a simulated green channel, are utilized
+                for GOES and Himawari. The Meteosat-9 and Meteosat-10 SEVIRI instruments are only capable
+                of producing all three required visible channels for portions of the full disk.
+                Thus, Meteosat images are "natural color" composites, which use an IR channel. I created
+                a simple custom composite in Satpy using the built-in DayNightCompositor
+                that generates the visible composites only on the day side. On the night side,
+                multiple IR channels (both shortwave ~3.9 um and longwave ~10.3 um) are used to view clouds and landmasses.
+            </p>
+            <p>
+                To blend the images without too much computational overhead,
+                I opted to create custom alpha masks based on satellite zenith angles.
+                We can get satellite zenith angles for each pixel in the image using the same 
+                AreaDefinition for our images by calling the function get_satellite_zenith_angles().
+                We can then normalize this data between 0 and 255, with the alpha value set to 255 below
+                a lower angle threshold and 0 above an upper angle threshold. This results in a smooth transition
+                effect near the edges of the satellite's full disk. Through trial and error,
+                I found a lower angle value of 70 degrees and an upper angle value of 85 degrees to provide the best results.
+                This data is only generated once and is saved to a txt file for each satellite.
+            </p>
+            <p>
+                For each satellite, the visible and IR composites are combined, and the alpha mask applied to the resulting image.
+                Every satellite's image is finally combined into a single global mosaic.
+            </p>
+            <h2>Results</h2>
+            <video width="100%" controls>
+                <source src="../images/looped_global_mosaic_1024x512.mp4">
+            </video>
+            <p style="text-align: center;">
+                <i>24 hour timelapse July 6/7, 2023</i>
+            </p>
+            <p>
+                Overall, I am very happy with how the images have turned out. Unfortunately,
+                there is a limit to the quality of the images due to the different composite types.
+                At the moment, there is not much I can do to resolve this with the amount of
+                compute available on my web server besides perhaps applying a filter to the Meteosat images.
+            </p>
+            <p>
+                I hope these images may be of use to you and that you find them as pleasing to look at as I do!
+            </p>
+
+        </div>
+    </body>
+</html>

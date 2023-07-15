@@ -1,0 +1,79 @@
+.transparent_bg {
+    background-color: rgba(0, 0, 0, 0.7);
+    width: 75%;
+    margin: auto;
+    border: 10% rgba(1, 1, 1, 0);
+    padding: 3%;
+    border-radius: 10px
+  }
+  
+  .topnav {
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0);
+  }
+
+  .topnav a {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    border-radius: 5px
+
+  }
+
+  .topnav a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+
+  .topnav a.active {
+    background-color: #45BF55;
+    color: white;
+  }
+
+  img {
+    opacity: 1.0;
+  }
+
+  img:hover {
+    opacity: 0.9;
+  }
+
+  body {
+    background-image: url("../images/minimalist-background.png");
+    background-attachment: fixed;
+    background-size: cover;
+    color: white;
+    font-family: Helvetica; 
+  }
+
+  figure {
+    margin: 1% 1%;
+    font-style: italic;
+    font-size: 8;
+  }
+
+  img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 10px
+  }
+
+  a:link {
+    color: #ffbe00;
+  }
+  
+  a:visited {
+    color: #45BF55;
+  }
+  
+  a:hover {
+    color: #e74c3c;
+  }
+  
+  a:active {
+    color: blue;
+  }
