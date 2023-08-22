@@ -1,0 +1,169 @@
+<!--use same style as astr-sim.html-->
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="style.css">
+        <title>Jackson Copeland</title>
+    </head>
+    <body>
+        <div class="topnav">
+            <a href="../index.html">Home</a>
+            <a href="projects.html">Projects</a>
+            <a href="CV.html">CV</a>
+            <a href="contact.html">Contact</a>
+        </div>
+
+        <div class="transparent_bg">
+            <h1>Simulating the Earth using geostationary remote sensing data</h1>
+            <h2><i>August 21, 2023</i></h2>
+            <p>
+                <img src="../images/tonga_eruption.gif" alt="2022 Tonga Eruption" style="width:100%">
+                <figcaption><i>January 15, 2022 Hunga Tonga-Hunga volcanic eruption, viewed in Earth Simulator.</i></figcaption>
+            </p>
+            <h2>Introduction</h2>
+            <p>
+                I have spent the past month or so developing an app I call Earth Simulator. This software
+                is designed to simplify downloading and processing of geostationary data from GOES-16,
+                GOES-17, Himawari-9, Meteosat-9, and Meteosat-10 while also allowing the user to display the generated
+                images on a 3D globe, with support for timelapses, geolocated image blending, and ultra high-resolution
+                images.
+            </p>
+            <p>
+                I wrote the app exclusively in Python, using PyOpenGL for rendering, wxPython for the GUI, Satpy
+                for image processing, and various other packages for computing secondary products such as blending
+                masks.
+            </p>
+            <p>
+                The app is still in it's very early stages. At the moment it only supports a few
+                composites for each satellite, but in the future I hope to implement support for 
+                every composite supported by Satpy, including individual channels. I also
+                hope to add support for more satellites, including polar orbiting ones.
+            </p>
+            <h2>Image Processing</h2>
+            <p>
+                One of the aspects of this project that I'm most proud of is my implementation of 
+                geolocated image blending. This is a technique that I developed to blend images
+                based on the geographic coordinates of each pixel. My technique has the added benefit of
+                being able to blend images of any size, as well as being quite efficient by precomputing
+                the blending masks.
+            </p>
+            <p>
+                The first step for generating the blending masks is to calculate the longitude and latitude
+                coordinates of each point on a 3D model of a sphere (representing the Earth). Once complete, 
+                we can determine which vertices are present in each image, as well as which images
+                share vertices in common.
+            </p>
+            <p>
+                Then, for whichever image we want to blend, we must compute the pixel coordinates of each vertex
+                in the image as well as the pixel coordinates of that vertex in the neighboring satellite's image.
+                Additionally, we must calculate a 'weight' associated with that vertex,
+                which is a normalized ratio of the longitudinal distances between the vertex and the satellites.
+            </p>
+            <p>
+                At this point, we must triangulate the vertex pixels. First, you generate a list of
+                triangles corresponding to the vertices on each image. You can use the pixel coordinates
+                of each triangle's vertices to calculate an initial list of pixels corresponding to the bounding box
+                of that triangle. Then, using barycentric coordinates, you remove all pixels outside the triangle. For each
+                pixel in the triangle, you calculate the pixel coordinates of the same geographic location in the 
+                neighboring image by converting the barycentric coordinates to pixel coordinates. This gives the pixel with which
+                you need to blend. To get the weight, or how much to blend by, you must simply use the barycentric 
+                coordinates to interpolate between the weights of each vertex.
+            </p>
+            <p>
+                This method is very efficient because we can select the granularity of our blending mask
+                by changing the number of vertices on our 3D model. Furthermore, using vectorized functions allows the process
+                of triangulation to be quite fast, although it does require a lot of memory. Nonetheless,
+                I am able to generate a high quality blending mask for an image ~5000x5000 pixels in size in a matter of seconds 
+                with 8GB of RAM.
+            </p>
+
+            <h2>Rendering</h2>
+            <p>
+                Because we are only rendering a maximum of five satellite images at a time, the simplest way to render
+                the images on our sphere is to only render the vertices that are present in each image and load each texture
+                into memory simultaneously. This becomes an issue if you want to load many images
+                at once due to the large overhead, so I recently implemented barebones timelapse functionality so the images
+                are loaded sequentially when you want to generate your own images. Finally, this application supports extremely 
+                large images (~20,000x20,000 pixels) by splitting the image up into smaller textures for rendering.
+            </p>
+
+            <h2>Results</h2>
+            <p>
+                The results are not only beautiful, but potentially useful for scientific applications.
+                This blending algorithm can dramatically improve the quality of the images
+                at large zenith angles and can correct for perspective distortion and small errors in the images.
+                Furthermore, because my application uses an orthographic camera, the images are not distorted by 
+                the curvature of the Earth, allowing the user to generate orthorectified images and maps. Here's 
+                a single use-case example:
+            </p>
+            <h3>Tonga Test Case</h3>
+            <p>
+                On January 15, 2022, the Hunga Tonga-Hunga volcano erupted in the South Pacific Ocean.
+                The resulting ash cloud and shockwave were captured by the geostationary satellites GOES-17 and Himawari-8.
+            </p>
+            <h4>Zoomed-out Shots</h4>
+            <video width="100%" controls>
+            <source src="../images/medium_shot_looped.mp4" alt="Zoomed out shot directly over the eruption" style="width:100%">
+            </video>
+            <figcaption><i>Himawari-8 and GOES-17 blended images.</i></figcaption>
+            <p></p>
+           
+            <video width="100%" controls>
+            <source src="../images/himawari_medium_looped.mp4" alt="Zoomed out shot directly over the eruption" style="width:100%">
+            </video>
+            <figcaption><i>Himawari-8 on top, not blended.</i></figcaption>
+            <p></p>
+
+            <video width="100%" controls>
+            <source src="../images/goes_west_medium_looped.mp4" alt="Zoomed out shot directly over the eruption" style="width:100%">
+            </video>
+            <figcaption><i>GOES-17 on top, not blended.</i></figcaption>
+
+            <h4>Zoomed-in Shots</h4>
+            <video width="100%" controls>
+            <source src="../images/close_shot_looped.mp4" alt="Zoomed out shot directly over the eruption" style="width:100%">
+            </video>
+            <figcaption><i>Close-up blended images.</i></figcaption>
+            <p></p>
+
+            <video width="100%" controls>
+            <source src="../images/himawari_close_looped.mp4" alt="Zoomed out shot directly over the eruption" style="width:100%">
+            </video>
+            <figcaption><i>Himawari-8 on top, not blended.</i></figcaption>
+            <p></p>
+
+            <video width="100%" controls>
+            <source src="../images/goes_west_close_looped.mp4" alt="Zoomed out shot directly over the eruption" style="width:100%">
+            </video>
+            <figcaption><i>GOES-17 on top, not blended.</i></figcaption>
+            <p></p>
+
+            <h4>Direct Image Comparisons</h4>
+            <p>If you feel so inclined, open these images up in your browser to see the differences.</p>
+
+            <div class="row">
+                <div class="column">
+                    <img src="../images/frame_6_blended.png" alt="Himawari-8 comparison" style="width:100%">
+                    <figcaption><i>Himawari-8 and GOES-17 blended images.</i></figcaption>
+                </div>
+                <div class="column">
+                    <img src="../images/himawari_frame_6.png" alt="Himawari-8 comparison" style="width:100%">
+                    <figcaption><i>Himawari-8 on top, not blended.</i></figcaption>
+                </div>
+                <div class="column">
+                    <img src="../images/goes_west_frame_6.png" alt="GOES-17 comparison" style="width:100%">
+                    <figcaption><i>GOES-17 on top, not blended.</i></figcaption>
+                </div>
+            </div>
+            
+            <p>I would argue that the Himawari images are superior for the zoomed in shots, but the user
+                will have the power to decide to blend or not to blend. Since perspective correction is noticeable
+                in these images, blending should be useful for some cases even when it doesn't make an image strictly more beautiful.
+            </p>
+            <p>
+                Overall, I'm glad I've finally reached a point where I'm getting good results. I'll be taking a break to email potential grad advisors
+                and study for the GRE, but I will continue to pick this project back up when I have time to spare.
+            </p>
+        </body>
+</html>
+    
