@@ -34,9 +34,10 @@
                 masks.
             </p>
             <p>
-                The app is still in it's very early stages. At the moment it only supports a few
+                The app is still in it's very early stages. <s>At the moment it only supports a few
                 composites for each satellite, but in the future I hope to implement support for 
-                every composite supported by Satpy, including individual channels. I also
+                every composite supported by Satpy, including individual channels.</s> As of August 29, 2023, Earth Simulator
+                has support for most Satpy composites. I also
                 hope to add support for more satellites, including polar orbiting ones.
             </p>
             <h2>Image Processing</h2>
@@ -83,7 +84,7 @@
                 the images on our sphere is to only render the vertices that are present in each image and load each texture
                 into memory simultaneously. This becomes an issue if you want to load many images
                 at once due to the large overhead, so I recently implemented barebones timelapse functionality so the images
-                are loaded sequentially when you want to generate your own images. Finally, this application supports extremely 
+                are loaded sequentially when you want to generate your own timelapses. Finally, this application supports extremely 
                 large images (~20,000x20,000 pixels) by splitting the image up into smaller textures for rendering.
             </p>
 
@@ -92,20 +93,26 @@
                 The results are not only beautiful, but potentially useful for scientific applications.
                 This blending algorithm can dramatically improve the quality of the images
                 at large zenith angles and can correct for perspective distortion and small errors in the images.
-                Furthermore, because my application uses an orthographic camera, the images are not distorted by 
+                Furthermore, because the application uses an orthographic camera, the images are not distorted by 
                 the curvature of the Earth, allowing the user to generate orthorectified images and maps. Here's 
                 a single use-case example:
             </p>
             <h3>Tonga Test Case</h3>
             <p>
                 On January 15, 2022, the Hunga Tonga-Hunga volcano erupted in the South Pacific Ocean.
-                The resulting ash cloud and shockwave were captured by the geostationary satellites GOES-17 and Himawari-8.
+                The resulting ash cloud and shock wave were captured by the geostationary satellites GOES-17 and Himawari-8.
             </p>
 
             <div style="text-align: center;">
-                <iframe allow="fullscreen" width="75%" height="300px" src="https://www.youtube.com/embed/FRcEDODj63I  "></iframe>
+                <iframe allow="fullscreen" width="75%" height="300px" src="https://www.youtube.com/embed/FRcEDODj63I"></iframe>
                 <p><i>A comparison of blended vs. non-blended images.</i></p>
-            </div>            
+            </div>     
+            
+            <div style="text-align: center;">
+                <iframe allow="fullscreen" width="75%" height="300px" src="https://www.youtube.com/embed/btQ4vISF3iI"></iframe>
+                <p><i>Shock wave traveling around the Earth, shown using time-differential IR 6.9 um images corresponding to 
+                    mid-level Tropospheric water vapor</i></p>
+            </div>   
 
             <h4>Direct Image Comparisons</h4>
             <p>If you feel so inclined, open these images up in your browser to see the differences.</p>
