@@ -1,3 +1,19 @@
+a:link {
+  color: #ffbe00;
+}
+
+a:visited {
+  color: #45BF55;
+}
+
+a:hover {
+  color: #e74c3c;
+}
+
+a:active {
+  color: blue;
+}
+
 .transparent_bg {
     background-color: rgba(0, 0, 0, 0.7);
     width: 75%;
@@ -14,18 +30,18 @@
 
   .topnav a {
     float: left;
-    color: #f2f2f2;
+    
+    color: black;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
     font-size: 17px;
     border-radius: 5px
-
   }
 
   .topnav a:hover {
     background-color: #ddd;
-    color: black;
+    color: gray;
   }
 
   .topnav a.active {
@@ -42,7 +58,7 @@
   }
 
   body {
-    background-image: url("../images/minimalist-background.png");
+    background-image: url("../images/daisetsuzen.JPG");
     background-attachment: fixed;
     background-size: cover;
     color: white;
@@ -60,20 +76,4 @@
     margin-left: auto;
     margin-right: auto;
     border-radius: 10px
-  }
-
-  a:link {
-    color: #ffbe00;
-  }
-  
-  a:visited {
-    color: #45BF55;
-  }
-  
-  a:hover {
-    color: #e74c3c;
-  }
-  
-  a:active {
-    color: blue;
   }
